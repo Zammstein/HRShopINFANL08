@@ -1,7 +1,5 @@
 package main;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -33,6 +31,7 @@ public class UIhandler {
 		 System.out.println("1. Log in");
          System.out.println("2. View class");
          String decision = scanner.next();
+         
          if (decision.matches("1")) {
          	if (verifyUser()) {
              	System.out.println("ID:			Naam:			Wachtwoord:			Klas:			Ingeschreven:");
@@ -41,8 +40,8 @@ public class UIhandler {
          } else if (decision.matches("2")) {
            	System.out.println("Enter a class to view:");
          	String klas = scanner.next();
-         	String query = "SELECT id, naam, klas, ingeschreven FROM student WHERE klas ='" + klas + "' AND ingeschreven = 't'";
-         	ArrayList<Student> result = dbHandler.getStudents(query);
+         	//String query = "SELECT id, naam, klas, ingeschreven FROM student WHERE klas ='" + klas + "' AND ingeschreven = 't'";
+         	ArrayList<Student> result = dbHandler.getStudentsByKlas(klas);
          	System.out.println("ID:			Naam:			Klas:			Ingeschreven:");
             for (Student s : result) {
             	System.out.println(s.getId() + "			" + s.getName() + "			" + s.getKlas() + "			" + s.getIngeschreven());

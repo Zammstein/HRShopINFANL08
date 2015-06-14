@@ -27,12 +27,16 @@ public class DBhandler {
 		try {
             dbConnection = DriverManager.getConnection(url, dbUser, dbPassword);
             dbStatement = dbConnection.createStatement();
-            //password = "a'; DROP TABLE student; --";
-            System.out.println(id);
-            System.out.println(password);
             PreparedStatement ps = dbConnection.prepareStatement("SELECT * FROM student WHERE id = '" + id + "' AND wachtwoord = '" + password.toString() + "'");
+            
+            
+            //The code beneath can be used to avoid SQL injections, unlike the way it is done above. 
+            /*PreparedStatement ps = dbConnection.prepareStatement("SELECT * FROM student WHERE id =? AND wachtwoord =?");
+            ps.setString(1, id);
+            ps.setString(2, password);*/
+            
+
             result = ps.executeQuery();
-            // result = dbStatement.executeQuery("SELECT * FROM student WHERE id = '    1' OR 'a' = 'a    );
             if (result.next()) {
             	student = new Student (
             		result.getString("id"),
@@ -41,12 +45,12 @@ public class DBhandler {
             		result.getString("klas"),
             		result.getString("ingeschreven")
             	);
+            } else {
+            	System.err.println("False ID/Password combination");
             }
-            if (!result.first()) System.err.println("False ID/Password combination");
 
             return student;
 		} catch (Exception e) {
-			// e.printStackTrace();
 			System.err.println("False ID/Password combination");
 		} 
 		
@@ -65,14 +69,14 @@ public class DBhandler {
 		return student;
 	}
 	
-	public ArrayList<Student> getStudents(String query) {
+	public ArrayList<Student> getStudentsByKlas(String klas) {
 		ArrayList<Student> students = new ArrayList<Student>();
 		ResultSet result = null;
 		try {
             dbConnection = DriverManager.getConnection(url, dbUser, dbPassword);
-            dbStatement = dbConnection.createStatement();
-            result = dbStatement.executeQuery(query);
-            
+            PreparedStatement query = dbConnection.prepareStatement("SELECT * FROM student WHERE klas=? AND ingeschreven = 't'");
+            query.setString(1, klas);
+            result = query.executeQuery();
             while (result.next()) {
             	Student s = new Student(result.getString("id"), result.getString("naam"), "", result.getString("klas"), result.getString("ingeschreven"));
             	students.add(s);
@@ -94,30 +98,5 @@ public class DBhandler {
         }
         return students;
 		
-	}
-	
-	public ResultSet fireQuery(String query) {
-		ResultSet result = null;
-		try {
-            dbConnection = DriverManager.getConnection(url, dbUser, dbPassword);
-            dbStatement = dbConnection.createStatement();
-            result = dbStatement.executeQuery(query);
-            return result;
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println("No class found!");
-		}
-        try {
-            if (dbStatement != null) {
-            	dbStatement.close();
-            }
-            if (dbConnection != null) {
-            	dbConnection.close();
-            }
-        } catch (SQLException ex) {
-        	 System.out.println(ex);
-             ex.printStackTrace();
-        }
-		return result;
 	}
 }
